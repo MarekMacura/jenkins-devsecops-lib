@@ -1,0 +1,231 @@
+[  
+  {  
+    "uid": "leadtime-high",  
+    "title": "Lead Time to Deploy Too High",  
+    "condition": "C",  
+    "data": [  
+      {  
+        "refId": "A",  
+        "relativeTimeRange": {  
+          "from": 300,  
+          "to": 0  
+        },  
+        "datasourceUid": "PROMETHEUS_DS_UID",  
+        "model": {  
+          "expr": "lead_time_to_deploy_hours",  
+          "interval": "",  
+          "legendFormat": "",  
+          "refId": "A"  
+        }  
+      },  
+      {  
+        "refId": "B",  
+        "relativeTimeRange": {  
+          "from": 300,  
+          "to": 0  
+        },  
+        "datasourceUid": "-100",  
+        "model": {  
+          "expression": "A > 24",  
+          "type": "math",  
+          "refId": "B"  
+        }  
+      },  
+      {  
+        "refId": "C",  
+        "relativeTimeRange": {  
+          "from": 300,  
+          "to": 0  
+        },  
+        "datasourceUid": "-100",  
+        "model": {  
+          "expression": "B",  
+          "type": "reduce",  
+          "reduce": { "reducer": "last" },  
+          "refId": "C"  
+        }  
+      }  
+    ],  
+    "noDataState": "NO_DATA",  
+    "execErrState": "ERROR",  
+    "for": "5m",  
+    "annotations": { "summary": "Lead Time to Deploy > 24h" },  
+    "labels": { "severity": "critical" }  
+  },  
+  {  
+    "uid": "deployfreq-low",  
+    "title": "Low Deployment Frequency",  
+    "condition": "C",  
+    "data": [  
+      {  
+        "refId": "A",  
+        "relativeTimeRange": { "from": 3600, "to": 0 },  
+        "datasourceUid": "PROMETHEUS_DS_UID",  
+        "model": {  
+          "expr": "deployment_frequency_per_week",  
+          "interval": "",  
+          "legendFormat": "",  
+          "refId": "A"  
+        }  
+      },  
+      {  
+        "refId": "B",  
+        "relativeTimeRange": { "from": 3600, "to": 0 },  
+        "datasourceUid": "-100",  
+        "model": {  
+          "expression": "A < 2",  
+          "type": "math",  
+          "refId": "B"  
+        }  
+      },  
+      {  
+        "refId": "C",  
+        "relativeTimeRange": { "from": 3600, "to": 0 },  
+        "datasourceUid": "-100",  
+        "model": {  
+          "expression": "B",  
+          "type": "reduce",  
+          "reduce": { "reducer": "last" },  
+          "refId": "C"  
+        }  
+      }  
+    ],  
+    "noDataState": "NO_DATA",  
+    "execErrState": "ERROR",  
+    "for": "1h",  
+    "annotations": { "summary": "Deployment Frequency < 2/week" },  
+    "labels": { "severity": "warning" }  
+  },  
+  {  
+    "uid": "failurerate-high",  
+    "title": "High Change Failure Rate",  
+    "condition": "C",  
+    "data": [  
+      {  
+        "refId": "A",  
+        "relativeTimeRange": { "from": 300, "to": 0 },  
+        "datasourceUid": "PROMETHEUS_DS_UID",  
+        "model": {  
+          "expr": "change_failure_rate * 100",  
+          "interval": "",  
+          "legendFormat": "",  
+          "refId": "A"  
+        }  
+      },  
+      {  
+        "refId": "B",  
+        "relativeTimeRange": { "from": 300, "to": 0 },  
+        "datasourceUid": "-100",  
+        "model": {  
+          "expression": "A > 20",  
+          "type": "math",  
+          "refId": "B"  
+        }  
+      },  
+      {  
+        "refId": "C",  
+        "relativeTimeRange": { "from": 300, "to": 0 },  
+        "datasourceUid": "-100",  
+        "model": {  
+          "expression": "B",  
+          "type": "reduce",  
+          "reduce": { "reducer": "last" },  
+          "refId": "C"  
+        }  
+      }  
+    ],  
+    "noDataState": "NO_DATA",  
+    "execErrState": "ERROR",  
+    "for": "5m",  
+    "annotations": { "summary": "Change Failure Rate > 20%" },  
+    "labels": { "severity": "critical" }  
+  },  
+  {  
+    "uid": "mttr-high",  
+    "title": "High MTTR",  
+    "condition": "C",  
+    "data": [  
+      {  
+        "refId": "A",  
+        "relativeTimeRange": { "from": 300, "to": 0 },  
+        "datasourceUid": "PROMETHEUS_DS_UID",  
+        "model": {  
+          "expr": "mean_time_to_restore_hours",  
+          "interval": "",  
+          "legendFormat": "",  
+          "refId": "A"  
+        }  
+      },  
+      {  
+        "refId": "B",  
+        "relativeTimeRange": { "from": 300, "to": 0 },  
+        "datasourceUid": "-100",  
+        "model": {  
+          "expression": "A > 6",  
+          "type": "math",  
+          "refId": "B"  
+        }  
+      },  
+      {  
+        "refId": "C",  
+        "relativeTimeRange": { "from": 300, "to": 0 },  
+        "datasourceUid": "-100",  
+        "model": {  
+          "expression": "B",  
+          "type": "reduce",  
+          "reduce": { "reducer": "last" },  
+          "refId": "C"  
+        }  
+      }  
+    ],  
+    "noDataState": "NO_DATA",  
+    "execErrState": "ERROR",  
+    "for": "5m",  
+    "annotations": { "summary": "MTTR > 6h" },  
+    "labels": { "severity": "critical" }  
+  },  
+  {  
+    "uid": "vulns-high",  
+    "title": "High Vulnerabilities",  
+    "condition": "C",  
+    "data": [  
+      {  
+        "refId": "A",  
+        "relativeTimeRange": { "from": 300, "to": 0 },  
+        "datasourceUid": "PROMETHEUS_DS_UID",  
+        "model": {  
+          "expr": "max(sast_vulnerabilities, sca_vulnerabilities, container_vulnerabilities, dast_vulnerabilities)",  
+          "interval": "",  
+          "legendFormat": "",  
+          "refId": "A"  
+        }  
+      },  
+      {  
+        "refId": "B",  
+        "relativeTimeRange": { "from": 300, "to": 0 },  
+        "datasourceUid": "-100",  
+        "model": {  
+          "expression": "A > 50",  
+          "type": "math",  
+          "refId": "B"  
+        }  
+      },  
+      {  
+        "refId": "C",  
+        "relativeTimeRange": { "from": 300, "to": 0 },  
+        "datasourceUid": "-100",  
+        "model": {  
+          "expression": "B",  
+          "type": "reduce",  
+          "reduce": { "reducer": "last" },  
+          "refId": "C"  
+        }  
+      }  
+    ],  
+    "noDataState": "NO_DATA",  
+    "execErrState": "ERROR",  
+    "for": "5m",  
+    "annotations": { "summary": "Vulnerabilities > 50" },  
+    "labels": { "severity": "critical" }  
+  }  
+]  

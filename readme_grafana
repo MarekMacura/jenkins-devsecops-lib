@@ -1,0 +1,37 @@
+define alert rules for:
+Metric	Condition	Alert Name
+Lead Time to Deploy (h)	> 24 for 5m	LeadTimeHigh
+Deployment Frequency/week	< 2 for 1h	LowDeploymentFrequency
+Change Failure Rate (%)	> 20 for 5m	HighChangeFailureRate
+MTTR (h)	> 6 for 5m	HighMTTR
+Vulnerabilities	> 50 for 5m (any type)	HighVulnerabilities
+1. How Grafana Alerts Work Now
+
+Since Grafana 8+, alerts are decoupled from dashboards and stored in the Unified Alerting system.
+They are defined as JSON in Grafana Alerting → Alert rules (or via provisioning YAML).
+
+We’ll provide JSON alert definitions you can import via Alerting → Alert rules → New → Import.
+You will then link them to notification policies (Slack, Email, Teams).
+
+
+3. How to Use
+
+    Replace PROMETHEUS_DS_UID with your Prometheus data source UID:
+        Go to Grafana → Data Sources → Prometheus → Settings
+        Find the UID in the URL (/datasources/edit/<UID>)
+    Go to Alerting → Alert rules → New → Import
+    Paste this JSON
+    Save
+    Go to Alerting → Notification policies
+        Add rules for:
+            Slack
+            Email
+            Microsoft Teams
+        Match on severity=critical or severity=warning
+
+4. What You’ll Get
+
+    🚨 Real-time alerting when thresholds are breached
+    🔔 Notifications in Slack/Email/Teams
+    📈 Alerts tied directly to metrics from Jenkins pipelines
+    ✅ Full DevSecOps + DORA observability & incident response loop

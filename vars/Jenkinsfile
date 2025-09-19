@@ -1,0 +1,108 @@
+@Library('devsecops-lib') _  
+  
+pipeline {  
+    agent any  
+  
+    environment {  
+        APP_NAME     = "my-app"  
+        IMAGE_TAG    = "latest"  
+        REGISTRY_URL = "registry.example.com"  
+        METRICS_API  = "http://metrics-collector.example.com/api/devsecops"  
+        SONAR_HOST_URL = "http://sonarqube:9000"  
+        SONARQUBE_TOKEN = credentials('sonarqube-token')  
+        ZAP_API_KEY = credentials('zap-api-key')  
+    }  
+  
+    stages {  
+        stage('Checkout') {  
+            steps {  
+                script {  
+                    devsecopsPipeline.checkoutCode()  
+                    commitTime = devsecopsPipeline.getCommitTimestamp()  
+                }  
+            }  
+        }  
+  
+        stage('Build') {  
+            steps {  
+                devsecopsPipeline.buildApp()  
+            }  
+        }  
+  
+        stage('Unit Tests') {  
+            steps {  
+                devsecopsPipeline.runUnitTests()  
+            }  
+            post {  
+                always {  
+                    junit 'target/surefire-reports/*.xml'  
+                }  
+            }  
+        }  
+  
+        stage('Security Scans (Parallel)') {  
+            parallel {  
+                stage('SAST') {  
+                    steps {  
+                        script {  
+                            sastVulns = devsecopsPipeline.runSAST()  
+                        }  
+                    }  
+                }  
+                stage('SCA') {  
+                    steps {  
+                        script {  
+                            scaVulns = devsecopsPipeline.runSCA()  
+                        }  
+                    }  
+                }  
+                stage('Build & Container Scan') {  
+                    steps {  
+                        script {  
+                            devsecopsPipeline.buildDockerImage()  
+                            containerVulns = devsecopsPipeline.scanContainerImage()  
+                        }  
+                    }  
+                }  
+            }  
+        }  
+  
+        stage('Deploy to Dev Environment') {  
+            steps {  
+                devsecopsPipeline.deployToDev()  
+            }  
+        }  
+  
+        stage('Dynamic Application Security Testing (DAST)') {  
+            steps {  
+                script {  
+                    dastVulns = devsecopsPipeline.runDAST()  
+                }  
+            }  
+        }  
+    }  
+  
+    post {  
+        always {  
+            script {  
+                def leadTimeMillis = System.currentTimeMillis() - commitTime  
+                def deploymentFrequency = devsecopsPipeline.getDeploymentFrequency(7)  
+                def changeFailureRate = devsecopsPipeline.getChangeFailureRate(7)  
+                def mttrMillis = devsecopsPipeline.getMTTR(7)  
+  
+                devsecopsPipeline.recordMetrics(  
+                    leadTimeMillis: leadTimeMillis,  
+                    deploymentFrequency: deploymentFrequency,  
+                    failureRate: changeFailureRate,  
+                    mttrMillis: mttrMillis,  
+                    result: currentBuild.currentResult,  
+                    sastVulns: sastVulns ?: 0,  
+                    scaVulns: scaVulns ?: 0,  
+                    containerVulns: containerVulns ?: 0,  
+                    dastVulns: dastVulns ?: 0,  
+                    metricsApiUrl: METRICS_API  
+                )  
+            }  
+        }  
+    }  
+}  
